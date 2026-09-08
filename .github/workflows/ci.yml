@@ -1,0 +1,47 @@
+name: Vite CI/CD Pipeline
+
+# O workflow será executado a cada push ou pull request na branch principal (main)
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Build e Testes
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o código do repositório
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # 2. Configura a versão do Node.js
+      - name: Setup do Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Versão recomendada (LTS)
+          cache: 'npm' # Habilita cache para acelerar as próximas execuções
+
+      # 3. Instala as dependências (usando a flag que resolveu seu erro anterior)
+      - name: Instalar dependências
+        run: npm install --legacy-peer-deps
+
+      # 4. Verificação de código (Lint)
+      - name: Rodar Lint
+        run: npm run lint
+
+      # 5. Gera a pasta dist (Build)
+      - name: Build do Projeto (Vite)
+        run: npm run build
+
+      # 6. Salva a pasta 'dist' como um artefato baixável no GitHub
+      - name: Fazer Upload do Artefato (dist)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-gatinhos
+          path: dist/
+          retention-days: 7 # O artefato ficará disponível para download por 7 dias
